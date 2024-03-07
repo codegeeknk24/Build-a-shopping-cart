@@ -143,7 +143,7 @@ function pay(amount) {
    npm run test
 */
 
- exports = {
+module.exports = {
   products,
   cart,
   addProductToCart,
