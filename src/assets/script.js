@@ -1,6 +1,5 @@
 /* Create an array named products which you will use to add all of your product object literals that you create in the next step. */
 const products = [];
-let grandTotal = 0
 
 /* Create 3 or more product objects using object literal notation 
    Each product should include five properties
@@ -50,6 +49,11 @@ products.push(prod3);
 /* Declare an empty array named cart to hold the items in the cart */
 const cart = [];
 
+// Find a product in the productList by the productId, and return the target product
+function getProductByIdFromList(productId, productList) {
+  return productList.find((product) => product.productId === productId);
+}
+
 /* Create a function named addProductToCart that takes in the product productId as an argument
   - addProductToCart should get the correct product based on the productId
   - addProductToCart should then increase the product's quantity
@@ -57,10 +61,12 @@ const cart = [];
 */
 
 function addProductToCart(productId) {
-  const product = products.find(eachProduct => eachProduct.productId === productId)
+
+  // Find the product in the products by its ID
+  let product = getProductByIdFromList(productId, products)
   product.quantity += 1
 
-  let isProductInCart = cart.find(eachProduct => eachProduct.productId === product.productId)
+  let isProductInCart = getProductByIdFromList(productId, cart)
 
   // isProductInCart checks if the product is already in cart 
   if (!isProductInCart) {
@@ -73,9 +79,16 @@ function addProductToCart(productId) {
   - increaseQuantity should then increase the product's quantity
 */
 
+// Increase the quantity of a product in the cart
 function increaseQuantity(productId) {
-  let product = products.find(product => product.productId === productId)
-  product.quantity += 1
+
+  // Find the product in the cart by its ID
+  let product = getProductByIdFromList(productId, cart)
+  
+  // If the product exists in the cart, increase its quantity by 1
+  if (product) {
+    product.quantity++;
+  }
 }
 
 
@@ -85,14 +98,20 @@ function increaseQuantity(productId) {
   - if the function decreases the quantity to 0, the product is removed from the cart
 */
 
+// Decrease the quantity of a product in the cart
 function decreaseQuantity(productId) {
-  let product = cart.find(product => product.productId === productId)
-  product.quantity -= 1
+  
+  // Find the product in the cart by its ID
+  let product = getProductByIdFromList(productId, cart)
 
-  if (product.quantity <= 0) {
-    const index = cart.indexOf(product);
-    cart.splice(index, 1);
-  }
+  // If the product exists in the cart, decrease its quantity by 1
+  if (product) {
+    product.quantity--;
+    if (product.quantity <= 0) {
+      const index = cart.indexOf(product);
+      cart.splice(index, 1);
+    }
+  }  
 }
 
 /* Create a function named removeProductFromCart that takes in the productId as an argument
@@ -101,8 +120,13 @@ function decreaseQuantity(productId) {
   - removeProductFromCart should remove the product from the cart
 */
 
+// Remove product from the cart
 function removeProductFromCart(productId) {
-  let product = cart.find(product => product.productId === productId);
+  
+  // Find the product in the cart by its ID
+  let product = getProductByIdFromList(productId, cart)
+  
+  // If the product exists, remove it from the cart
   if (product) {
     product.quantity = 0;
     const index = cart.indexOf(product);
@@ -114,26 +138,60 @@ function removeProductFromCart(productId) {
   - cartTotal should iterate through the cart to get the total of all products
   - cartTotal should return the sum of the products in the cart
 */
+
+// Variable to track the total amount paid
+let grandTotal = 0;
+
+// Calcualte and sum up cart total amount
 function cartTotal() {
+
   let sum = 0;
   for (let i = 0; i < cart.length; i++) {
     sum += (cart[i].quantity*cart[i].price); 
   }
+
+  // Convert sum value to two decimal points
   grandTotal = Number.parseFloat(sum.toFixed(2));
-  return grandTotal; //value of 'sum'
+  return grandTotal;
 };
 
-/* Create a function called emptyCart that empties the products from the cart */
+// Remove all the products and empty the cart
+function emptyCart() {
+  if (cart)
+    cart.splice(0, cart.length);
+}
 
 /* Create a function named pay that takes in an amount as an argument
   - pay will return a negative number if there is a remaining balance
   - pay will return a positive number if money should be returned to customer
 */
 
+// Variable to track the total amount paid
+let totalPaid = 0;
+
+// Cacluate total paid about and return remaining amount
 function pay(amount) {
-  return  Number.parseFloat((amount - grandTotal).toFixed(2));
+
+    // Add the current payment amount to the totalPaid variable
+    totalPaid += amount;
+
+    // Calculate the difference between the totalPaid and the grandTotal
+    let remaining = totalPaid - grandTotal;
+
+    // Check if the remaining amount is greater than or equal to zero
+    if (remaining >= 0) {
+        // If so, reset the `totalPaid` to zero to prepare it for the next
+        // payment, as the current payment is enough to cover the `grandTotal`.
+        totalPaid = 0;
+        emptyCart()
+    }
+
+    // Return the remaining (negative if payment is less than the cartTotal)
+    return Number.parseFloat(remaining.toFixed(2));
 };
 
+/* Function: addItemToCart  
+}
 /* Place stand out suggestions here (stand out suggestions can be found at the bottom of the project rubric.)*/
 
 
@@ -151,8 +209,8 @@ module.exports = {
   decreaseQuantity,
   removeProductFromCart,
   cartTotal,
-  pay, 
-//   emptyCart,
+  pay,
+  emptyCart,
 
   /* Uncomment the following line if completing the currency converter bonus */
   // currency
